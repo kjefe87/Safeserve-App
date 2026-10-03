@@ -12,7 +12,7 @@ Airtable is the database. Next.js (App Router) is the front end. Hosting: Vercel
 | `/issues` | all report; Owner/Manager manage | Report, assign, set due date, resolve (notes required) |
 | `/compliance-logs` | Owner/Manager | Read-only audit trail |
 | `/staff-certs` | Owner/Manager | Certifications and expiry status |
-| `/inspection-report` | Owner/Manager | Live snapshot + saved reports |
+| `/inspection-report` | Owner/Manager | Live snapshot, saved reports, and a downloadable PDF per report |
 
 ## Setup
 1. `npm install`
@@ -38,7 +38,9 @@ Airtable is the database. Next.js (App Router) is the front end. Hosting: Vercel
 
 ## Known limits
 - Photo uploads aren't supported (Airtable's API needs a hosted file URL).
-- The Report PDF is generated outside the app (Make.com); the app only links it.
+- Report PDFs are built on demand by the app (`lib/reportPdf.js`, pdf-lib) from a snapshot saved
+  on the report record (`Issues Snapshot` field). Reports created before that field existed
+  download with counts only. The PDF is not stored back in Airtable's `Report PDF` field.
 - 4-digit PINs are weak by nature. The throttle slows guessing but isn't a hard guarantee.
 - `npm audit` flags PostCSS inside Next.js; this app never processes untrusted CSS.
   Revisit when upgrading to Next 16.

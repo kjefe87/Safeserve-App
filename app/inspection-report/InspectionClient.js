@@ -106,7 +106,13 @@ export default function InspectionClient() {
               {r.inspectorName && <div style={{ fontSize: 14, marginTop: 6 }}><b>Inspector:</b> {r.inspectorName}</div>}
               {r.inspectorNotes && <div style={{ fontSize: 14 }}><b>Notes:</b> {r.inspectorNotes}</div>}
               {r.actionPlan && <div style={{ fontSize: 14 }}><b>Action plan:</b> {r.actionPlan}</div>}
-              {r.pdfUrl && <a href={r.pdfUrl} style={{ fontSize: 14 }}>Download PDF</a>}
+              <div style={{ marginTop: 8, display: "flex", gap: 14, alignItems: "center" }}>
+                <a href={`/api/inspection-report/${r.id}/pdf`} style={{ ...ui.button, textDecoration: "none", border: "1px solid #888", borderRadius: 4, color: "inherit" }}>
+                  Download PDF
+                </a>
+                {!r.hasDetail && <span style={ui.muted}>Older report: counts only (no issue list saved)</span>}
+                {r.pdfUrl && <a href={r.pdfUrl} style={{ fontSize: 14 }}>Attached PDF</a>}
+              </div>
             </div>
           ))}
         </div>

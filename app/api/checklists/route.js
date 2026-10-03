@@ -1,15 +1,13 @@
 import { NextResponse } from "next/server";
 import { getChecklists } from "@/lib/airtable";
-import { getSession } from "@/lib/session";
+import { requireSession } from "@/lib/guard";
 
 export async function GET() {
-  const session = await getSession();
-  if (!session.userId) {
-    return NextResponse.json({ error: "Not logged in." }, { status: 401 });
-  }
+  const { session, error } = await requireSession();
+  if (error) return error;
 
   try {
-    const checklists = await getChecklists();
+    const checklists = await getChecklists(session.restaurantName);
     return NextResponse.json({ checklists });
   } catch (err) {
     console.error(err);

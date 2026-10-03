@@ -1,8 +1,6 @@
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/session";
 
-// Pages every role can see vs. Owner/Manager-only pages —
-// mirrors the visibility table in the SafeServe handoff note section 2.3.
 const STAFF_LINKS = [
   { href: "/checklists", label: "Checklists" },
   { href: "/issues", label: "Issues Log" },

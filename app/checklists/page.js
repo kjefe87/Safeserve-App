@@ -6,18 +6,26 @@ export default function ChecklistsPage() {
   const [checklists, setChecklists] = useState([]);
   const [loading, setLoading] = useState(true);
   const [completingId, setCompletingId] = useState(null);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     fetch("/api/checklists")
-      .then((res) => res.json())
-      .then((data) => {
+      .then(async (res) => {
+        const data = await res.json().catch(() => ({}));
+        if (res.status === 401) {
+          window.location.href = "/login";
+          return;
+        }
+        if (!res.ok) throw new Error(data.error || "Failed to load checklists.");
         setChecklists(data.checklists || []);
-        setLoading(false);
-      });
+      })
+      .catch((e) => setError(e.message))
+      .finally(() => setLoading(false));
   }, []);
 
   async function handleComplete(task) {
     setCompletingId(task.id);
+    setError("");
     const res = await fetch("/api/checklists/complete", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -28,6 +36,10 @@ export default function ChecklistsPage() {
       setChecklists((prev) =>
         prev.map((t) => (t.id === task.id ? { ...t, status: "Completed" } : t))
       );
+    } else {
+      const data = await res.json().catch(() => ({}));
+      if (res.status === 401) window.location.href = "/login";
+      setError(data.error || "Couldn't save that. Try again.");
     }
     setCompletingId(null);
   }
@@ -39,7 +51,8 @@ export default function ChecklistsPage() {
       <a href="/dashboard" style={{ fontSize: 14, color: "#555" }}>
         ← Dashboard
       </a>
-      <h1 style={{ fontSize: 22, marginTop: 8, marginBottom: 20 }}>Daily Checklists</h1>
+      <h1 style={{ fontSize: 22, marginTop: 8, marginBottom: 20 }}>Checklists</h1>
+      {error && <p style={{ color: "crimson", marginBottom: 12 }}>{error}</p>}
 
       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
         {checklists.map((task) => (

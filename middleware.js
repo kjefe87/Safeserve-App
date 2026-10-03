@@ -1,10 +1,5 @@
 import { NextResponse } from "next/server";
 
-// Runs on the edge, so we only check for the presence of the session cookie here —
-// not decrypt/verify it (iron-session's full verify needs Node runtime).
-// Each protected page does the real session check + role check server-side on render.
-// This middleware just stops obviously-logged-out users from even loading protected pages.
-
 const PROTECTED_PATHS = [
   "/dashboard",
   "/checklists",

@@ -9,7 +9,6 @@ export default function LoginPage() {
   const [pin, setPin] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const isLocalDev = process.env.NODE_ENV === "development";
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -67,32 +66,6 @@ export default function LoginPage() {
           {loading ? "Logging in..." : "Log in"}
         </button>
       </form>
-      {isLocalDev && (
-        <button
-          type="button"
-          disabled={loading}
-          onClick={async () => {
-            setError("");
-            setLoading(true);
-            const res = await fetch("/api/auth/dev-login", { method: "POST" });
-            setLoading(false);
-            if (!res.ok) {
-              setError("Local preview login failed.");
-              return;
-            }
-            router.push("/dashboard");
-          }}
-          style={{
-            width: "100%",
-            padding: 10,
-            cursor: "pointer",
-            marginTop: 12,
-            background: "transparent",
-          }}
-        >
-          Continue without Airtable (local only)
-        </button>
-      )}
     </main>
   );
 }

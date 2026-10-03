@@ -1,26 +1,24 @@
 import { NextResponse } from "next/server";
 import { markTaskComplete } from "@/lib/airtable";
-import { getSession } from "@/lib/session";
+import { requireSession } from "@/lib/guard";
 
 export async function POST(request) {
-  const session = await getSession();
-  if (!session.userId) {
-    return NextResponse.json({ error: "Not logged in." }, { status: 401 });
-  }
+  const { session, error } = await requireSession();
+  if (error) return error;
 
-  const { taskId, taskName } = await request.json();
-  if (!taskId || !taskName) {
-    return NextResponse.json({ error: "taskId and taskName are required." }, { status: 400 });
+  const { taskId } = await request.json().catch(() => ({}));
+  if (!taskId || typeof taskId !== "string") {
+    return NextResponse.json({ error: "taskId is required." }, { status: 400 });
   }
 
   try {
-    await markTaskComplete({
+    const result = await markTaskComplete({
       taskId,
-      taskName,
-      completedByName: session.name,
+      completedByRecordId: session.userId,
       restaurantName: session.restaurantName,
     });
-    return NextResponse.json({ success: true });
+    if (result.notFound) return NextResponse.json({ error: "Task not found." }, { status: 404 });
+    return NextResponse.json({ success: true, alreadyDone: !!result.alreadyDone });
   } catch (err) {
     console.error(err);
     return NextResponse.json({ error: "Failed to mark task complete." }, { status: 500 });
